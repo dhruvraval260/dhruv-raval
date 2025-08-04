@@ -1,0 +1,62 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# -------------------------------
+# Step 1: Simulate Sensor Data
+# -------------------------------
+
+# Simulate a time axis
+time = np.arange(0, 100, 1)  # 100 time steps
+
+# Simulate readings from three sensors
+sensor_1 = np.sin(0.1 * time) + np.random.normal(0, 0.1, len(time))
+sensor_2 = np.cos(0.1 * time) + np.random.normal(0, 0.1, len(time))
+sensor_3 = 0.5 * np.sin(0.2 * time) + np.random.normal(0, 0.1, len(time))
+
+# Create individual dataframes
+df1 = pd.DataFrame({'time': time, 'sensor_1': sensor_1})
+df2 = pd.DataFrame({'time': time, 'sensor_2': sensor_2})
+df3 = pd.DataFrame({'time': time, 'sensor_3': sensor_3})
+
+# -------------------------------
+# Step 2: Data Fusion (Join on Time)
+# -------------------------------
+
+# Merge all three dataframes on time
+fused_df = df1.merge(df2, on='time').merge(df3, on='time')
+
+print("Fused DataFrame:")
+print(fused_df.head())
+
+# -------------------------------
+# Step 3: Reshape for ML or Deep Learning
+# -------------------------------
+
+# Drop 'time' for model input
+X = fused_df.drop(columns='time').to_numpy()  # shape: (100, 3)
+
+# Reshape for LSTM (samples, timesteps, features)
+# Example: use sliding window of 10 time steps
+window_size = 10
+num_samples = len(X) - window_size + 1
+
+X_lstm = np.array([X[i:i+window_size] for i in range(num_samples)])  # shape: (91, 10, 3)
+
+print(f"\nReshaped for LSTM: {X_lstm.shape}  # (samples, timesteps, features)")
+
+# -------------------------------
+# Optional: Plot the sensor data
+# -------------------------------
+
+plt.figure(figsize=(10, 5))
+plt.plot(fused_df['time'], fused_df['sensor_1'], label='Sensor 1')
+plt.plot(fused_df['time'], fused_df['sensor_2'], label='Sensor 2')
+plt.plot(fused_df['time'], fused_df['sensor_3'], label='Sensor 3')
+plt.title("Simulated Sensor Data")
+plt.xlabel("Time")
+plt.ylabel("Sensor Reading")
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
