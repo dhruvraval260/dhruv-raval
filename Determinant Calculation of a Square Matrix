@@ -1,0 +1,12 @@
+import numpy as np
+
+# Define your square matrix
+A = np.array([
+    [1, 2, 3],
+    [0, 4, 5],
+    [1, 0, 6]
+])
+
+# Calculate determinant
+det = np.linalg.det(A)
+print(f"Determinant: {det:.2f}")
